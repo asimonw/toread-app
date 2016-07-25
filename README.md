@@ -82,7 +82,7 @@ Robert Pirsig - Zen And The Art Of Motorcycle Maintenance
 $
 ```
 
-This is all nice and easy. But I happen to be one of those annoying people who favour a functional style whenever it's useful. Note how we needed to create a new variable `i` and keep track of the number of books through `books.length` just to be able to perform an operation on every book. Shouldn't a computer be able to do that for us? You would like to be able to simply tell the compiler to execute a function for each item in an array. This is exactly what the `forEach` method on the `Array` prototype does for us. (Hopefully more on prototypes later.) The function to be executed is specified as a callback, like this:
+This works just fine, but note how we needed to create a new variable `i` and keep track of the number of books through `books.length` just to be able to perform an operation on every book. Shouldn't a computer be able to do that for us? We would like to be able to simply tell the compiler to execute a function for each item in an array. This is exactly what the `forEach` method on the `Array` prototype does for us. (Hopefully more on prototypes later.) The function to be executed is specified as a callback, like this:
 
 ```javascript
 books.forEach(function (book) {
@@ -90,8 +90,44 @@ books.forEach(function (book) {
 });
 ```
 
-Replace the `for` loop above with this more functional equivalent and you should see exactly the same output. Note how the (anonymous) callback function takes a single `book` object as its first argument (you can pass in the index as a second argument). This allows you to use every book of the array in turn in the callback.
+Replace the `for` loop above with this more _functional_ equivalent and you should see exactly the same output. Note how the (anonymous) callback function takes a single `book` object as its first argument (you can pass in the index as a second argument). This allows you to use every book of the array in turn in the callback. Though this is not a hardcore example of functional programming, it's definitely more functional than the explicit `for` loop, which is an example of imperative programming. Functional programming is often more expressive and maintainable, but whole books have been written about this. I'll try to give you a flavour of it as we go along.
 
 ### Interlude: git
 
-Coming soon...
+Before we add more features to our app, this is a good time to put our code into version control. This will allow us to easily return to the code the way it was written at any given time, experiment with new features without being afraid of losing what we already have and collaborate on the same code base with others. We'll use the most popular version control system around for this: _git_. Assuming that you've got git installed, all you need to do to put your project under version control is run
+
+```bash
+$ git init
+```
+
+in the root folder of your project, in this case the `toread-app` directory. This will create a hidden `.git` directory where all the magic happens. This means that if you ever need to remove git completely from your project, all you need to do is `rm -rf .git`, but make sure you know exactly what you're doing when you do that.
+
+What you now need to do is _stage_ the files which you want to _commit_ in your next version. To see what state your project is, run
+
+```bash
+$ git status
+```
+
+This should return a message including something like `Untracked files: app.js`. This means that currently git is not tracking changes you made to this file. In order to start tracking the file, you need to add it to the "staging area." You do this by `git add`ing it to staging. In this case, you could run
+
+```bash
+$ git add app.js
+```
+
+You can also add every untracked file (not in `.gitignore`, as we'll see later) in the project to staging by running `git add .`, which I often find myself doing. Here, `.` refers to the current directory. Running `git status` again should include a message like `modified: app.js`. This means that `app.js` has changed and these changes are now ready to be `commit`ted. A commit is git's way to save a new version to the version history.
+
+A commit will receive a unique hash to identify it, as well as a message that you specify when you perform the commit. You do this by running
+
+```bash
+$ git commit -m "Commit message"
+```
+
+Note that we didn't specify which files to commit. That's because git knows all the files which were previously staged (using `git add`) to be committed. The beauty of this combination of `git add` and `git commit` (unique to git) is that you can choose exactly which files should be part of a commit. This allows you to make commits more _atomic_, which is something you should always strive for. The "Commit message" above should clearly describe what changes the commit contains, which is definitely easier if the commit is atomic.
+
+Running `git status` again should tell you that your working directory is clean, which sounds like a good thing before calling it a day. Running
+
+```bash
+$ git log
+```
+
+will show you a list of commits with their hash numbers, author (username and email) and commit message. A nice way to see the history of your project. By the way, if the author info looks a bit odd, it's probably because you haven't told git how to set up your username and email yet. Look up `git config` in your favourite search engine for this. (If you're following along and ran into this very issue, you can run `git commit --amend --reset-author` to amend the author info in your last commit after you've configured this.)
