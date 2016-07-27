@@ -131,3 +131,55 @@ $ git log
 ```
 
 will show you a list of commits with their hash numbers, author (username and email) and commit message. A nice way to see the history of your project. By the way, if the author info looks a bit odd, it's probably because you haven't told git how to set up your username and email yet. Look up `git config` in your favourite search engine for this. (If you're following along and ran into this very issue, you can run `git commit --amend --reset-author` to amend the author info in your last commit after you've configured this.)
+
+### Get and post data
+
+Given any collection of data items (books in this case), there is a universal set of operations you might want to perform on it that is essentially _complete_. You want to be able to create, retrieve, update and delete items in the collection. These are collectively called _CRUD_ operations and they are essential in data-driven web applications (i.e. all non-trivial web apps).
+
+These operations are represented in HTTP by the methods (or verbs):
+
+* GET: retrieve
+* POST: create
+* PUT: update
+* DELETE
+
+Let's look at GET first. Before we look at this in a web context, it's instructive to take our simple command-line app a bit further. What we've done so far is basically equivalent to a "GET request" (return the whole list). But we'd also like to be able to specify a specific item to retrieve, instead of simple GETting the whole list.
+
+In order to do this, we need to be able to call the program with an extra parameter. There is a global object which is defined by default in every Node program, called `process`, which provides a lot of information about the currently running Node process. In particular, `process.argv` is an array which stores all the arguments with which the program was called.
+
+The first two items in `process.argv` are less important for us right now (path to the Node executable and the file running, respectively), but any extra parameters specified when launching the program will appear as additional items in the array.
+
+For instance, if we run `node app.js get`, `process.argv[2]` will equal `'get'`. Let's modify our code slightly to incorporate this and prepare it to respond to other methods as well.
+
+Add the following lines to the start of `app.js`:
+
+```javascript
+var argv = process.argv;
+var method = (argv.length > 2) ? argv[2] : 'get';
+```
+
+This makes sure that the first parameter after the file name is stored in the variable `method`, with GET as the default if no method is specified. Depending on the method specified, we will "dispatch" the code to run different functions (or _actions_). A `switch` statement is ideal for this:
+
+```javascript
+switch (method) {
+  case 'get':
+    get();
+    break;
+  default:
+    console.log('Method not recognised');
+}
+```
+
+This might feel silly right now, but as we add more methods, it will make more sense. Now all we need to do is warp the code to display the list of books in a function and we're done:
+
+```javascript
+function get() {
+  books.forEach(function (book) {
+    console.log(book.author + " - " + book.title);
+  });
+}
+```
+
+If you now run `node app.js get` (or `node app.js`) exactly the same as before will happen. But now we can easily add more functionality.
+
+First of all, if we specify an id after the word `get`, we'd like to retrieve only the book which corresponds to that id...

@@ -31,7 +31,7 @@ switch (method) {
     post();
     break;
   default:
-    console.log('Instruction not recognised');
+    console.log('Method not recognised');
 }
 
 // return all books, or one book with specified id
