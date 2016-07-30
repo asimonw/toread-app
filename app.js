@@ -38,12 +38,11 @@ switch (method) {
 function get() {
   var filteredBooks = books;
   if (argv.length > 3) {
-    var item = argv[3];
     filteredBooks = books.filter(function (book) {
-      return book.id === parseInt(item, 10);
+      return book.id === parseInt(argv[3], 10);
     });
     if (filteredBooks.length === 0) {
-      console.log('No book with that id');
+      console.log("No book with that id");
       return;
     }
   } else {
@@ -63,8 +62,8 @@ function post() {
       author: argv[3],
       title: argv[4]
     });
-    console.log('Book added to list');
+    console.log("Book added to list");
   } else {
-    console.log('Error: insufficient number of arguments');
+    console.log("Error: insufficient number of arguments");
   }
 }

@@ -182,4 +182,66 @@ function get() {
 
 If you now run `node app.js get` (or `node app.js`) exactly the same as before will happen. But now we can easily add more functionality.
 
-First of all, if we specify an id after the word `get`, we'd like to retrieve only the book which corresponds to that id...
+First of all, if we specify an id after the word `get`, we'd like to retrieve only the book which corresponds to that id. This id would then be `argv[3]`, which allows us to easily filter out the book with that `id`:
+
+```javascript
+var filteredBooks = books.filter(function (book) {
+  return book.id === parseInt(argv[3], 10);
+});
+```
+The `filter` method is another functional tool built into JavaScript. It returns a new array with only the objects for which the condition in its callback returns true. The callback again takes a single book as its argument and only the book for which the `id` is the same as the id provided through `argv[3]` is kept. `parseInt` is a built-in function which turns a string into a number, only keeping the integer part. The second argument specifies the base to be used. If the string can't be converted into a number, the function returns `NaN` (special "not a number" value).
+
+We can modify the `get` function in our program to behave differently if an id is provided:
+
+```javascript
+function get() {
+  var filteredBooks = books;
+  if (argv.length > 3) {
+    filteredBooks = books.filter(function (book) {
+      return book.id === parseInt(argv[3], 10);
+    });
+    if (filteredBooks.length === 0) {
+      console.log("No book with that id");
+      return;
+    }
+  } else {
+    console.log("Reading List:");
+  }
+  filteredBooks.forEach(function (book) {
+    console.log(book.author + " - " + book.title);
+  });
+}
+```
+
+Note that `filteredBooks` is set to `books` at the start and only modified in case an id is provided. If you now run `node app.js get` you'll still get the whole list, while running `node app.js get 1` would return only the second item. Specifying an id of 2 or higher would simply result in the message "No book with that id."
+
+A "POST request" should create a new item in the list. In order to make our simplistic id system work, we should keep track of how many items we have in the list. (Naively, we could think of using the length of `books`, but once we've built in a way to delete items, the length of the array wouldn't necessarily correspond to the highest value of `id` anymore.) For now, let's use the enterprise grade solution:
+
+```javascript
+var bookItems = books.length;
+```
+
+`bookItems` starts off as the length of `books` but can change independently from then on. This allows us to write a `post` function as follows:
+
+```javascript
+function post() {
+  if (argv.length > 4) {
+    books.push({
+      id: bookItems++,
+      author: argv[3],
+      title: argv[4]
+    });
+    console.log("Book added to list");
+  } else {
+    console.log("Error: insufficient number of arguments");
+  }
+}
+```
+
+Note that we now need to specify two extra parameters, one for the author and one for the title. For instance, we could add a book by typing `node app.js post "Isaac Asimov" Foundation`. If a parameter contains spaces, it needs to be quoted, otherwise your CLI will think you're specifying more arguments than you intend to. Don't forget to add a `case 'post'` to your `switch` statement to call the `post` function when necessary.
+
+There is one big problem though. Even if we manage to add an item to our list, as soon as the program terminates, the book array is erased from memory. So running a GET request after the last POST operation returns exactly the same 2 item list we started from. This is because we're not _persisting_ our data. We need to store the reading list in a file or database on our hard drive (for example), so that items can be retrieved from there and stored there when POSTing data. As a first solution, let's store our data in a file using the JSON format.
+
+### Get and post JSON
+
+Coming soon...
