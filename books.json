@@ -1,0 +1,17 @@
+[
+  {
+    "id": 0,
+    "author": "Douglas R. Hofstadter",
+    "title": "Gödel, Escher, Bach"
+  },
+  {
+    "id": 1,
+    "author": "Robert Pirsig",
+    "title": "Zen And The Art Of Motorcycle Maintenance"
+  },
+  {
+    "id": 2,
+    "author": "Isaac Asimov",
+    "title": "Foundation"
+  }
+]
