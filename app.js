@@ -18,8 +18,39 @@ switch (method) {
   case 'post':
     post();
     break;
+  case 'delete':
+    remove();
+    break;
+  case 'seed':
+    seed();
+    break;
   default:
     console.log('Method not recognised');
+}
+
+// read books from file and hand them in JSON format
+// to the provided callback to process fetched data
+function readBooks(processData) {
+  fs.readFile(BOOKS_FILE, function (error, data) {
+    if (error) {
+      console.error(error);
+      process.exit(1);
+    }
+    var books = JSON.parse(data);
+    processData(books);
+  });
+}
+
+// write books to file in JSON format
+// and display message if successful
+function writeBooks(books, message) {
+  fs.writeFile(BOOKS_FILE, JSON.stringify(books, null, 2), function (error) {
+    if (error) {
+      console.error(error);
+      process.exit(1);
+    }
+    console.log(message);
+  });
 }
 
 // return all books, or one book with specified id
@@ -80,4 +111,44 @@ function post() {
       console.log("Book added to list");
     });
   })
+}
+
+// delete book with provided id
+function remove() {
+  if (argv.length < 4) {
+    console.log("Error: insufficient number of arguments");
+    process.exit(1);
+  }
+
+  readBooks(function (books) {
+    var id = parseInt(argv[3], 10);
+    var removed = books.splice(id, 1);
+    if (removed.length === 0) {
+      console.log("No book with that id");
+    } else {
+      writeBooks(books, "Book with id " + id + " deleted");
+    }
+  });
+}
+
+// restore to default list (handy for testing)
+function seed() {
+  var defaultList = [
+    {
+      id: 0,
+      author: "Douglas R. Hofstadter",
+      title: "Gödel, Escher, Bach"
+    },
+    {
+      id: 1,
+      author: "Robert Pirsig",
+      title: "Zen And The Art Of Motorcycle Maintenance"
+    },
+    {
+      id: 2,
+      author: "Isaac Asimov",
+      title: "Foundation"
+    }
+  ];
+  writeBooks(defaultList, "Reading list restored to default");
 }
