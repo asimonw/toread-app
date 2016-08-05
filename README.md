@@ -244,4 +244,64 @@ There is one big problem though. Even if we manage to add an item to our list, a
 
 ### Get and post JSON
 
-Coming soon...
+JSON (JavaScript Object Notation) is a data transmission format that is used by pretty much any web API out there and is increasingly replacing XML as a key element of AJAX. One reason is that it uses essentially the same syntax as JavaScript objects, making it a very convenient way for the browser to talk to the server (especially when the service used to talk to the server is running on Node). For now, we will use it to simply story our reading list in a file.
+
+To this end, create a file called `books.json` in the same folder as `app.js` and populate it with the following:
+
+```javascript
+[
+  {
+    "id": 0,
+    "author": "Douglas R. Hofstadter",
+    "title": "Gödel, Escher, Bach"
+  },
+  {
+    "id": 1,
+    "author": "Robert Pirsig",
+    "title": "Zen And The Art Of Motorcycle Maintenance"
+  },
+  {
+    "id": 2,
+    "author": "Isaac Asimov",
+    "title": "Foundation"
+  }
+]
+```
+
+Since we will always load the list of books from `books.json`, you can remove the line `var books = [ ... ];` from `app.js`. Now, we need a way to read a file from storage. Fortunately, Node provides this pretty much out of the box. All we need to do is load a module called `fs` (which stands for File System) into our program and use the methods it provides. Node uses the _CommonJS_ specification for including code from another file (referred to as another _module_) into the current file. You do this by adding the following line to the top of the file:
+
+```javascript
+var fs = require('fs');
+```
+
+The `require` function is built into Node. It parses the content of the specified module (more on how it knows where to find it later) and returns the object (or function) which is _exported_ by the module. In this case, `fs` now provides an Application Programming Interface (API), which is essentially a set of methods, to interact with the local file system.
+
+The first method we need is `fs.readFile`. If we tell it where to find the file to read, it will read the contents of the file for us _asynchronously_ and pass the resulting data on to a callback function once it has it.
+
+```javascript
+fs.readFile(BOOKS_FILE, callback);
+```
+
+The `callback` function we provide can then be used to process the data. A Node convention is for the signature of the callback to be `callback(error, data)`. This allows us to handle the error if Node doesn't manage to find the file or anything else goes wrong. This leads to the following typical pattern: change the `get` function to:
+
+```javascript
+var BOOKS_FILE = 'books.json';
+
+function get() {
+  fs.readFile(BOOKS_FILE, function (error, data) {
+    if (error) {
+      console.error(error);
+      process.exit(1);
+    }
+
+    var books = JSON.parse(data);
+
+    // same code as before
+
+  });
+}
+```
+
+Once we're passed the error block, we know that we can handle the `data` safely. Note however that because the data is returned as one long string, we need to turn that data into a JavaScript object. The built-in `JSON.parse` does that for us. You can `console.log(books)` at this point to check whether the result is really equivalent to what we had when we had hard-coded `books`.
+
+Also notice that all the data processing we had before is now done within the body of the callback function. This is necessary because as I mentioned earlier, `fs.readFile` is a _non-blocking_ asynchronous function. This means that when you call it, it just _registers_ the callback to handle the data (or error) at a later point, goes off to do its thing while the rest of the code in the file is being executed, and calls the callback when the data is ready. This works because a reference to our callback is kept so that it stays around in memory. If we would try to access the data expected from `fs.readFile` right underneath that method call somehow, this data would simply not yet exist.
