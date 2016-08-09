@@ -305,3 +305,17 @@ function get() {
 Once we're passed the error block, we know that we can handle the `data` safely. Note however that because the data is returned as one long string, we need to turn that data into a JavaScript object. The built-in `JSON.parse` does that for us. You can `console.log(books)` at this point to check whether the result is really equivalent to what we had when we had hard-coded `books`.
 
 Also notice that all the data processing we had before is now done within the body of the callback function. This is necessary because as I mentioned earlier, `fs.readFile` is a _non-blocking_ asynchronous function. This means that when you call it, it just _registers_ the callback to handle the data (or error) at a later point, goes off to do its thing while the rest of the code in the file is being executed, and calls the callback when the data is ready. This works because a reference to our callback is kept so that it stays around in memory. If we would try to access the data expected from `fs.readFile` right underneath that method call somehow, this data would simply not yet exist.
+
+Referring to the file `'books.json'` with a relative path is also not very safe. If we use the absolute path to the file, this will always be correct no matter how the code is being accessed (e.g. this particular script could be called from a script residing in a different directory). To do this, we can use the global variable `__dirname`, which holds the path name to the directory in which the current script resides. We'll also use the `path` library, which makes it easy to work with path names in a cross-platform way. Add
+
+```javascript
+var path = require('path');
+```
+
+at the top of the file and replace the previous definition of `BOOKS_FILE` with
+
+```javascript
+var BOOKS_FILE = path.join(__dirname, 'books.json');
+```
+
+This should result in exactly the same behaviour in this particular case, but now you'll be able to sleep again at night.
