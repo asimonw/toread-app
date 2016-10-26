@@ -1,5 +1,8 @@
 # Toread app
 
+A full-stack JavaScript web application.
+
+<!---
 This is a tutorial about building web applications using full-stack JavaScript.
 
 And I hear you, there are enough todo app tutorials out there. So rather than boring you with yet another one, let me present to you: the toread app. Very different beast altogether: rather than allowing you to manage a list of todos and check the ones you've done, it allows you to manage a list of items you want to read and check the ones you've read. You're welcome.
@@ -319,3 +322,4 @@ var BOOKS_FILE = path.join(__dirname, 'books.json');
 ```
 
 This should result in exactly the same behaviour in this particular case, but now you'll be able to sleep again at night.
+--->
