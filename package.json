@@ -1,0 +1,23 @@
+{
+  "name": "toread-app",
+  "version": "1.0.0",
+  "description": "Toread App",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asimonw/toread-app.git"
+  },
+  "author": "Alex Wijns",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asimonw/toread-app/issues"
+  },
+  "homepage": "https://github.com/asimonw/toread-app#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
