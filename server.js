@@ -5,6 +5,7 @@ var path = require('path');
 var _ = require('lodash');
 
 var app = express();
+var booksRoute = express.Router();
 
 var BOOKS_FILE = path.join(__dirname, 'books.json');
 
@@ -23,7 +24,7 @@ function getBooks(req, res, next) {
   });
 }
 
-app.get('/books', getBooks, function (req, res) {
+booksRoute.get('/', getBooks, function (req, res) {
   var books = req.books;
   if (books) {
     res.json(books);
@@ -32,7 +33,7 @@ app.get('/books', getBooks, function (req, res) {
   }
 });
 
-app.get('/books/:id', getBooks, function (req, res) {
+booksRoute.get('/:id', getBooks, function (req, res) {
   var id = parseInt(req.params.id, 10);
   var books = req.books;
   if (books) {
@@ -42,6 +43,13 @@ app.get('/books/:id', getBooks, function (req, res) {
     res.json({});
   }
 });
+
+booksRoute.post('/', function (req, res) {
+  var book = req.body;
+  res.json(book)
+});
+
+app.use('/books', booksRoute);
 
 var server = app.listen(8080, function () {
   console.log("Listening on port " + server.address().port);
