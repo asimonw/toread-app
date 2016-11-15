@@ -24,16 +24,43 @@ function getBooks(req, res, next) {
   });
 }
 
-booksRoute.get('/', getBooks, function (req, res) {
-  var books = req.books;
-  if (books) {
-    res.json(books);
-  } else {
-    res.json([]);
-  }
-});
+booksRoute.use(getBooks);
 
-booksRoute.get('/:id', getBooks, function (req, res) {
+booksRoute.route('/')
+  .get(function (req, res) {
+    var books = req.books;
+    if (books) {
+      res.json(books);
+    } else {
+      res.json([]);
+    }
+  })
+  .post(function (req, res) {
+    var books = req.books;
+    var book = req.body || {};
+
+    var bookIds = books.map(function (book) {
+      return book.id;
+    });
+    var maxId = Math.max.apply(Math, bookIds);
+
+    books.push({
+      id: maxId + 1,
+      author: book.author || 'Unknown author',
+      title: book.title || 'Unknown title'
+    });
+    fs.writeFile(BOOKS_FILE, JSON.stringify(books, null, 2), function (error) {
+      if (error) {
+        console.error(error);
+        book.error = true;
+      } else {
+        console.log("Book added to list");
+      }
+    });
+    res.json(book);
+  });
+
+booksRoute.get('/:id', function (req, res) {
   var id = parseInt(req.params.id, 10);
   var books = req.books;
   if (books) {
@@ -42,11 +69,6 @@ booksRoute.get('/:id', getBooks, function (req, res) {
   } else {
     res.json({});
   }
-});
-
-booksRoute.post('/', function (req, res) {
-  var book = req.body;
-  res.json(book)
 });
 
 app.use('/books', booksRoute);
