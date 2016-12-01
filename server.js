@@ -60,16 +60,45 @@ booksRoute.route('/')
     res.json(book);
   });
 
-booksRoute.get('/:id', function (req, res) {
-  var id = parseInt(req.params.id, 10);
-  var books = req.books;
-  if (books) {
-    var book = _.find(books, { id: id});
-    res.json(book || {});
-  } else {
-    res.json({});
-  }
-});
+booksRoute.route('/:id')
+  .get(function (req, res) {
+    var id = parseInt(req.params.id, 10);
+    var books = req.books;
+    if (books) {
+      var book = _.find(books, { id: id});
+      res.json(book || {});
+    } else {
+      res.json({});
+    }
+  })
+  .delete(function (req, res) {
+    var id = parseInt(req.params.id, 10);
+    var books = req.books;
+    var book = {};
+    if (books) {
+      var filteredBooks = books.filter(function (book) {
+        return book.id !== id;
+      });
+      if (filteredBooks.length !== books.length) {
+        fs.writeFile(BOOKS_FILE, JSON.stringify(filteredBooks, null, 2), function (error) {
+          if (error) {
+            console.error(error);
+            book.error = true;
+          } else {
+            console.log("Book removed from list");
+            book.id = id;
+          }
+        });
+      } else {
+        console.log('No book with id', id);
+        book.error = true;
+      }
+    } else {
+      console.log('No book with id', id);
+      book.error = true;
+    }
+    res.json(book);
+  });
 
 app.use('/books', booksRoute);
 
