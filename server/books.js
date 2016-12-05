@@ -1,16 +1,10 @@
-var express = require('express');
-var bodyParser = require('body-parser');
 var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
 
-var app = express();
-var booksRoute = express.Router();
+var bookRoute = require('express').Router();
 
-var BOOKS_FILE = path.join(__dirname, 'books.json');
-
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
+var BOOKS_FILE = path.join(__dirname, '/../books.json');
 
 function getBooks(req, res, next) {
   fs.readFile(BOOKS_FILE, function (err, data) {
@@ -24,9 +18,9 @@ function getBooks(req, res, next) {
   });
 }
 
-booksRoute.use(getBooks);
+bookRoute.use(getBooks);
 
-booksRoute.route('/')
+bookRoute.route('/')
   .get(function (req, res) {
     var books = req.books;
     if (books) {
@@ -60,7 +54,7 @@ booksRoute.route('/')
     res.json(book);
   });
 
-booksRoute.route('/:id')
+bookRoute.route('/:id')
   .get(function (req, res) {
     var id = parseInt(req.params.id, 10);
     var books = req.books;
@@ -100,8 +94,4 @@ booksRoute.route('/:id')
     res.json(book);
   });
 
-app.use('/books', booksRoute);
-
-var server = app.listen(8080, function () {
-  console.log("Listening on port " + server.address().port);
-});
+  module.exports = bookRoute;
