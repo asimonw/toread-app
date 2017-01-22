@@ -71,6 +71,28 @@ bookRoute.route('/:id')
       res.json({});
     }
   })
+  .put(function (req, res) {
+    var id = parseInt(req.params.id, 10);
+    var books = req.books;
+    res.book = req.body || {};
+    if (books) {
+      var bookIndex = _.findIndex(books, { id: id});
+      if (bookIndex > -1) {
+        _.assign(books[bookIndex], res.book);
+        saveBooks(res, books, function () {
+          console.log("Book updated");
+        });
+      } else {
+        console.log('No book with id', id);
+        res.book.error = true;
+        res.json(res.book);
+      }
+    } else {
+      console.log('No book with id', id);
+      res.book.error = true;
+      res.json(res.book);
+    }
+  })
   .delete(function (req, res) {
     var id = parseInt(req.params.id, 10);
     var books = req.books;
