@@ -18,6 +18,18 @@ function getBooks(req, res, next) {
   });
 }
 
+function saveBooks(res, books, callback) {
+  fs.writeFile(BOOKS_FILE, JSON.stringify(books, null, 2), function (error) {
+    if (error) {
+      console.error(error);
+      res.book.error = true;
+    } else {
+      callback();
+    }
+    res.json(res.book);
+  });
+}
+
 bookRoute.use(getBooks);
 
 bookRoute.route('/')
@@ -31,7 +43,7 @@ bookRoute.route('/')
   })
   .post(function (req, res) {
     var books = req.books;
-    var book = req.body || {};
+    res.book = req.body || {};
 
     var bookIds = books.map(function (book) {
       return book.id;
@@ -40,18 +52,12 @@ bookRoute.route('/')
 
     books.push({
       id: maxId + 1,
-      author: book.author || 'Unknown author',
-      title: book.title || 'Unknown title'
+      author: res.book.author || 'Unknown author',
+      title: res.book.title || 'Unknown title'
     });
-    fs.writeFile(BOOKS_FILE, JSON.stringify(books, null, 2), function (error) {
-      if (error) {
-        console.error(error);
-        book.error = true;
-      } else {
-        console.log("Book added to list");
-      }
+    saveBooks(res, books, function () {
+      console.log("Book added to list");
     });
-    res.json(book);
   });
 
 bookRoute.route('/:id')
@@ -68,30 +74,27 @@ bookRoute.route('/:id')
   .delete(function (req, res) {
     var id = parseInt(req.params.id, 10);
     var books = req.books;
-    var book = {};
+    res.book = {};
+
     if (books) {
       var filteredBooks = books.filter(function (book) {
         return book.id !== id;
       });
       if (filteredBooks.length !== books.length) {
-        fs.writeFile(BOOKS_FILE, JSON.stringify(filteredBooks, null, 2), function (error) {
-          if (error) {
-            console.error(error);
-            book.error = true;
-          } else {
-            console.log("Book removed from list");
-            book.id = id;
-          }
+        saveBooks(res, filteredBooks, function () {
+          console.log("Book removed from list");
+          res.book.id = id;
         });
       } else {
         console.log('No book with id', id);
-        book.error = true;
+        res.book.error = true;
+        res.json(res.book);
       }
     } else {
       console.log('No book with id', id);
-      book.error = true;
+      res.book.error = true;
+      res.json(res.book);
     }
-    res.json(book);
   });
 
   module.exports = bookRoute;
