@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
+var Promise = require('bluebird');
 
 var bookRoute = require('express').Router();
 
@@ -18,15 +19,13 @@ function getBooks(req, res, next) {
   });
 }
 
-function saveBooks(res, books, callback) {
-  fs.writeFile(BOOKS_FILE, JSON.stringify(books, null, 2), function (error) {
-    if (error) {
-      console.error(error);
-      res.book.error = true;
-    } else {
-      callback();
-    }
-    res.json(res.book);
+// promisify fs.writeFile 
+function writeFile(filename, books) {
+  return new Promise(function (resolve, reject) {
+    fs.writeFile(filename, JSON.stringify(books, null, 2), function (err, data) {
+      if (err) reject(err);
+      else resolve(data);
+    });
   });
 }
 
@@ -79,9 +78,17 @@ bookRoute.route('/:id')
       var bookIndex = _.findIndex(books, { id: id});
       if (bookIndex > -1) {
         _.assign(books[bookIndex], res.book);
-        saveBooks(res, books, function () {
-          console.log("Book updated");
-        });
+        writeFile(BOOKS_FILE, books)
+          .then(function (data) {
+            console.log("Book updated");
+          })
+          .catch(function (err) {
+            console.error(err);
+            req.books = null;
+          })
+          .finally(function () {
+            res.json(res.book);
+          });
       } else {
         console.log('No book with id', id);
         res.book.error = true;
@@ -103,10 +110,18 @@ bookRoute.route('/:id')
         return book.id !== id;
       });
       if (filteredBooks.length !== books.length) {
-        saveBooks(res, filteredBooks, function () {
-          console.log("Book removed from list");
-          res.book.id = id;
-        });
+        writeFile(BOOKS_FILE, filteredBooks)
+          .then(function (data) {
+            console.log("Book removed from list");
+            res.book.id = id;
+          })
+          .catch(function (err) {
+            console.error(err);
+            req.books = null;
+          })
+          .finally(function () {
+            res.json(res.book);
+          });
       } else {
         console.log('No book with id', id);
         res.book.error = true;
