@@ -1,30 +1,7 @@
 var app = require('./server');
+var {mongoose} = require('./server/db/mongoose');
+var {Book} = require('./server/models/book');
 
-var mongoose = require('mongoose');
-
-mongoose.Promise = require('bluebird');
-mongoose.connect('mongodb://localhost:27017/ToreadApp');
-
-var BookSchema = {
-  title: {
-    type: String,
-    required: true,
-    minlength: 1,
-    trim: true
-  },
-  author: {
-    type: String,
-    required: true,
-    minlength: 1,
-    trim: true
-  },
-  completed: {
-    type: Boolean,
-    default: false
-  }
-};
-
-var Book = mongoose.model('Book', BookSchema);
 var toread = new Book({
   author: 'Nick Bostrom',
   title: 'Superintelligence'
