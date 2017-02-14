@@ -1,7 +1,6 @@
 // var fs = require('fs');
 // var path = require('path');
 var _ = require('lodash');
-// var Promise = require('bluebird');
 
 var {mongoose} = require('./db/mongoose');
 var {ObjectId} = require('mongodb');
@@ -51,26 +50,30 @@ bookRoute.route('/')
     });
 
     book.save()
-      .then(function (doc) {
-        console.log('Book saved', JSON.stringify(doc, undefined, 2));
-        res.send(doc);
+      .then(function (book) {
+        res.send({book});
       })
       .catch(function (e) {
-        console.log('Unable to save book', e);
         res.status(400).send();
       });
   });
 
 bookRoute.route('/:id')
   .get(function (req, res) {
-    // var id = parseInt(req.params.id, 10);
-    // var books = req.books;
-    // if (books) {
-    //   var book = _.find(books, { id: id});
-    //   res.json(book || {});
-    // } else {
-    //   res.json({});
-    // }
+    var id = req.params.id;
+    if (!ObjectId.isValid(id)) {
+      res.status(404).send();
+    }
+    Book.findById(id)
+      .then(function (book) {
+        if (!book) {
+          res.status(404).send();
+        }
+        res.send({book});
+      })
+      .catch(function (e) {
+        res.status(400).send();
+      });
   })
   .put(function (req, res) {
     // var id = parseInt(req.params.id, 10);
@@ -103,37 +106,20 @@ bookRoute.route('/:id')
     // }
   })
   .delete(function (req, res) {
-    // var id = parseInt(req.params.id, 10);
-    // var books = req.books;
-    // res.book = {};
-    //
-    // if (books) {
-    //   var filteredBooks = books.filter(function (book) {
-    //     return book.id !== id;
-    //   });
-    //   if (filteredBooks.length !== books.length) {
-    //     writeFile(BOOKS_FILE, filteredBooks)
-    //       .then(function (data) {
-    //         console.log("Book removed from list");
-    //         res.book.id = id;
-    //       })
-    //       .catch(function (err) {
-    //         console.error(err);
-    //         req.books = null;
-    //       })
-    //       .finally(function () {
-    //         res.json(res.book);
-    //       });
-    //   } else {
-    //     console.log('No book with id', id);
-    //     res.book.error = true;
-    //     res.json(res.book);
-    //   }
-    // } else {
-    //   console.log('No book with id', id);
-    //   res.book.error = true;
-    //   res.json(res.book);
-    // }
+    var id = req.params.id;
+    if (!ObjectId.isValid(id)) {
+      res.status(404).send();
+    }
+    Book.findByIdAndRemove(id)
+      .then(function (book) {
+        if (!book) {
+          res.status(404).send();
+        }
+        res.send({book});
+      })
+      .catch(function (e) {
+        res.status(400).send();
+      });
   });
 
   module.exports = bookRoute;
