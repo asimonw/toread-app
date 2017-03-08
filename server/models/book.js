@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var BookSchema = {
+const BookSchema = {
   title: {
     type: String,
     required: true,
@@ -19,6 +19,6 @@ var BookSchema = {
   }
 };
 
-var Book = mongoose.model('Book', BookSchema);
+const Book = mongoose.model('Book', BookSchema);
 
 module.exports = {Book};
