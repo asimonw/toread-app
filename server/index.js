@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const bookRoute = require('./books');
 const app = express();
 
+app.use(express.static('public', { extensions: ['html'] }));
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
