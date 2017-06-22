@@ -1,9 +1,13 @@
-const path = require('path');
+const path = require('path')
 
 module.exports = {
-  entry: './public/src/index.js',
+  entry: [
+    'webpack-dev-server/client?http://localhost:8080',
+    './public/src/js/index.js'
+  ],
   output: {
-    filename: './public/dist/bundle.js'
+    path: path.resolve(__dirname, 'public/dist'),
+    filename: 'bundle.js'
   },
   module: {
     rules: [
@@ -12,9 +16,13 @@ module.exports = {
         include: [path.resolve(__dirname, 'public/src')],
         loader: 'babel-loader',
         options: {
-          presets: ['es2015']
+          presets: ['es2015', 'react']
         }
       }
     ]
+  },
+  devServer: {
+    publicPath: '/dist',
+    contentBase: path.resolve(__dirname, 'public')
   }
-};
+}
