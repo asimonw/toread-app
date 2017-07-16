@@ -2,7 +2,7 @@ const path = require('path')
 
 module.exports = {
   entry: [
-    'webpack-dev-server/client?http://localhost:8080',
+    'webpack-dev-server/client?http://localhost:3000',
     './public/src/js/index.js'
   ],
   output: {
@@ -23,6 +23,13 @@ module.exports = {
   },
   devServer: {
     publicPath: '/dist',
-    contentBase: path.resolve(__dirname, 'public')
+    contentBase: path.resolve(__dirname, 'public'),
+    port: 3000,
+    proxy: {
+      '/': {
+        target: 'http://localhost:8080/',
+        secure: false
+      }
+    }
   }
 }
