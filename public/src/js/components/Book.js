@@ -3,7 +3,7 @@ import React from 'react'
 class Book extends React.Component {
   render() {
     let {author, title, _id} = this.props.item
-    console.log(_id);
+
     return (
       <li>
         {author}: {title}

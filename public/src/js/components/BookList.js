@@ -8,8 +8,13 @@ class BookList extends React.Component {
   constructor () {
     super()
     this.state = {
-      books: []
+      books: [],
+      newAuthor: '',
+      newTitle: ''
     }
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleAuthorChange = this.handleAuthorChange.bind(this)
+    this.handleTitleChange = this.handleTitleChange.bind(this)
   }
 
   componentDidMount () {
@@ -29,7 +34,34 @@ class BookList extends React.Component {
       .catch(err => console.error(err))
   }
 
+  handleAuthorChange(e) {
+    this.setState({ newAuthor: e.target.value })
+  }
+
+  handleTitleChange(e) {
+    this.setState({ newTitle: e.target.value })
+  }
+
+  handleSubmit(e) {
+    e.preventDefault()
+    let newBook = {
+      author: this.state.newAuthor,
+      title: this.state.newTitle
+    }
+    axios.post('/books', newBook)
+      .then(response => {
+        let updatedBooks = [...this.state.books, response.data.book]
+        this.setState({
+          books: updatedBooks,
+          newAuthor: '',
+          newTitle: ''
+        })
+      })
+      .catch(err => console.error(err))
+  }
+
   render () {
+    // TODO: refactor out form
     return (
       <div className="booklist">
         <ul>
@@ -38,10 +70,12 @@ class BookList extends React.Component {
               handleDelete={this.handleDelete.bind(this)} />
           )}
         </ul>
-        <form action="/books" method="post">
+        <form onSubmit={this.handleSubmit}>
           <h2>Add a book</h2>
-          <input name="author" />
-          <input name="title" />
+          <input name="author" value={this.state.newAuthor}
+            onChange={this.handleAuthorChange} />
+          <input name="title" value={this.state.newTitle}
+            onChange={this.handleTitleChange} />
           <button type="submit">Add</button>
         </form>
       </div>
