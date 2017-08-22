@@ -1,17 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {HashRouter} from 'react-router-dom'
 
-import BookList from './components/BookList'
+import App from './App'
 
-class App extends React.Component {
-  render() {
-    return (
-      <div className='app'>
-        <h1>Reading list</h1>
-        <BookList />
-      </div>
-    )
-  }
-}
-
-ReactDOM.render(<App />, document.getElementById('root'))
+ReactDOM.render((
+  <HashRouter>
+    <App />
+  </HashRouter>
+), document.getElementById('root'))
