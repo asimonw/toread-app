@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const UserSchema = {
   email: {
@@ -13,6 +13,6 @@ const UserSchema = {
     minlength: 6,
     trim: true
   }
-};
+}
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema)
